@@ -1,5 +1,5 @@
 
-# PART 1Arabic Text Preprocessing and Scoring Pipeline
+# PART 1 : Arabic Text Preprocessing and Scoring Pipeline
 
 ## Overview
 
@@ -173,7 +173,7 @@ This project provides a robust pipeline for preprocessing Arabic text and calcul
 Feel free to extend the pipeline or modify it according to your specific requirements. If you encounter any issues or have suggestions for improvements, please open an issue or submit a pull request.
 
 
-# PART2 Arabic Text Relevance Scoring with Deep Learning Models
+# PART 2 : Arabic Text Relevance Scoring with Deep Learning Models
 
 This project focuses on predicting relevance scores for Arabic text using various deep learning models. The models used include RNN, Bidirectional RNN, GRU, and LSTM. The relevance scores are normalized using `StandardScaler` during training and denormalized during prediction.
 
@@ -317,6 +317,50 @@ To denormalize the predicted scores:
 ```python
 denormalized_score = scaler.inverse_transform(predicted_score)[0][0]
 ```
+# PART 4 : BERT-Based Sentiment Analysis on Amazon Fashion Reviews
+
+## Project Overview
+This project leverages a pre-trained BERT model (bert-base-uncased) to perform sentiment analysis on Amazon Fashion reviews. The goal is to fine-tune the BERT model to classify reviews as positive or negative, based on their star ratings. Reviews with 4 or 5 stars are labeled as positive, while reviews with 1, 2, or 3 stars are labeled as negative. The performance of the model is evaluated using standard metrics such as Accuracy, Loss, and F1 Score.
+
+## Dataset
+The dataset used in this project is the Amazon Fashion Reviews dataset, which can be downloaded from [here](https://nijianmo.github.io/amazon/index.html). The dataset contains various fields, but we focus primarily on the `reviewText` (the text of the review) and `overall` (the star rating) columns.
+
+## Project Steps
+
+### 1. Load and Preprocess the Data
+- Load the dataset from a JSON file.
+- Handle missing values in the `reviewText` column by filling them with empty strings.
+- Ensure all entries in the `reviewText` column are strings.
+- Convert the star ratings into binary labels for sentiment classification: reviews with ratings >= 4 are labeled as positive (1), and the rest are labeled as negative (0).
+
+### 2. Tokenize the Reviews
+- Use the `BertTokenizer` from the Hugging Face `transformers` library to tokenize the review texts.
+- Pad and truncate the tokenized sequences to a maximum length of 128 tokens.
+- Convert the tokenized texts into PyTorch tensors for model input.
+
+### 3. Create DataLoaders
+- Split the dataset into training and validation sets.
+- Create PyTorch `TensorDataset` and `DataLoader` objects for both training and validation sets to facilitate batch processing.
+
+### 4. Fine-Tune the BERT Model
+- Initialize a pre-trained BERT model (`bert-base-uncased`) with a sequence classification head.
+- Set up the optimizer (`AdamW`) and learning rate scheduler.
+- Train the model for a specified number of epochs, updating the model parameters and learning rate at each step.
+- During each epoch, compute the average training loss and validate the model to compute the average validation loss, accuracy, and F1 score.
+
+### 5. Evaluate the Model
+- After training, evaluate the model on the validation set using the evaluation function.
+- Compute and display the final validation loss, accuracy, and F1 score.
+
+## Model Evaluation Metrics
+- **Accuracy**: The proportion of correct predictions out of the total number of predictions.
+- **Loss**: The value of the loss function, indicating how well the model is performing.
+- **F1 Score**: The harmonic mean of precision and recall, providing a single metric that balances both.
+
+### 6. Conclusion
+The pre-trained BERT model is fine-tuned effectively for the sentiment analysis task on the Amazon Fashion reviews dataset. The use of BERT allows leveraging contextual embeddings, which leads to better performance compared to traditional methods. The model's performance is evaluated using standard metrics (Accuracy, Loss, F1 Score), and it demonstrates the effectiveness of pre-trained language models in text classification tasks.
+
+
 
 ## License
 
