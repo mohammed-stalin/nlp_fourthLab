@@ -598,6 +598,6 @@ This project focused on fine-tuning a BERT model for sentiment analysis on Amazo
 
  ## License
 
-This project is licensed under the MIT License. See the `[include](File:LICENCE.md)` file for more details.
+This project is licensed under the MIT License. See the [include](File:LICENCE) file for more details.
 
 ---
