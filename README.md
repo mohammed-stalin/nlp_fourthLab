@@ -506,10 +506,6 @@ The dataset used in this project is the Amazon Fashion Reviews dataset, which ca
 
 
 
-## License
-
-This project is licensed under the MIT License. See the `LICENSE` file for more details.
----
 ## General Conclusion and Learnings
 
 ### PART 1: Arabic Text Preprocessing and Scoring Pipeline
@@ -599,3 +595,9 @@ This project focused on fine-tuning a BERT model for sentiment analysis on Amazo
 - **End-to-End Project Management:** Developed skills in managing end-to-end machine learning projects, from data preprocessing and model training to evaluation and deployment.
 - **Handling Arabic Text:** Enhanced knowledge of handling and processing Arabic text, addressing its unique challenges in NLP tasks.
 - **Transfer Learning Benefits:** Recognized the advantages of transfer learning and fine-tuning pre-trained models for specialized tasks, improving performance and efficiency.
+
+ ## License
+
+This project is licensed under the MIT License. See the `LICENSE` file for more details.
+
+---
