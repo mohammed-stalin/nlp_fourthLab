@@ -317,6 +317,160 @@ To denormalize the predicted scores:
 ```python
 denormalized_score = scaler.inverse_transform(predicted_score)[0][0]
 ```
+# PART 3 : Fine-Tuning GPT-2 for Quote Generation
+
+## Project Overview
+This project demonstrates how to fine-tune the pre-trained GPT-2 language model on a custom dataset of quotes and use it to generate new quotes. The fine-tuning process involves training the model on a dataset of quotes to adapt its language generation capabilities to the style and content of the quotes.
+
+## Steps
+
+### 1. Install Required Libraries
+Install the necessary libraries, including `transformers` and `torch`, using the following command:
+```bash
+!pip install transformers torch
+```
+
+### 2. Load the Pre-trained GPT-2 Model and Tokenizer
+Load the GPT-2 model and tokenizer from the Hugging Face `transformers` library:
+```python
+from transformers import GPT2Tokenizer, GPT2LMHeadModel
+
+model_name = 'gpt2'
+model = GPT2LMHeadModel.from_pretrained(model_name)
+tokenizer = GPT2Tokenizer.from_pretrained(model_name)
+```
+
+### 3. Prepare the Dataset
+Create a custom `QuotesDataset` class to load and process the quotes dataset:
+```python
+class QuotesDataset(Dataset):
+    def __init__(self, file_path, tokenizer, end_of_text_token=""):
+        super().__init__()
+        self.quote_list = []
+        self.end_of_text_token = end_of_text_token
+        self.tokenizer = tokenizer
+
+        with open(file_path, 'r', encoding='utf-8') as file:
+            for line in file:
+                quote_str = f"{line.strip()} {self.end_of_text_token}"
+                self.quote_list.append(quote_str)
+
+    def __len__(self):
+        return len(self.quote_list)
+
+    def __getitem__(self, item):
+        return self.quote_list[item]
+```
+
+### 4. Load the Dataset
+Specify the paths to your dataset files and load them:
+```python
+train_file_path = 'train2.txt'
+valid_file_path = 'valid2.txt'
+test_file_path = 'test2.txt'
+
+train_dataset = QuotesDataset(train_file_path, tokenizer)
+valid_dataset = QuotesDataset(valid_file_path, tokenizer)
+test_dataset = QuotesDataset(test_file_path, tokenizer)
+```
+
+### 5. Create DataLoaders
+Create DataLoaders for batching the data during training:
+```python
+from torch.utils.data import DataLoader
+from torch.nn.utils.rnn import pad_sequence
+
+def collate_fn(batch):
+    input_ids = [torch.tensor(tokenizer.encode(item)) for item in batch]
+    input_ids_padded = pad_sequence(input_ids, batch_first=True, padding_value=tokenizer.pad_token_id)
+    return input_ids_padded
+
+train_dataloader = DataLoader(train_dataset, batch_size=1, shuffle=True, collate_fn=collate_fn)
+valid_dataloader = DataLoader(valid_dataset, batch_size=1, collate_fn=collate_fn)
+```
+
+### 6. Fine-Tune the Model
+Fine-tune the GPT-2 model on the custom dataset:
+```python
+from transformers import AdamW, get_linear_schedule_with_warmup
+
+EPOCHS = 20
+LEARNING_RATE = 3e-5
+WARMUP_STEPS = 500
+BATCH_SIZE = 2
+MAX_SEQ_LEN = 600
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model.to(device)
+
+optimizer = AdamW(model.parameters(), lr=LEARNING_RATE)
+total_steps = len(train_dataloader) * EPOCHS
+scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=WARMUP_STEPS, num_training_steps=total_steps)
+
+for epoch in range(EPOCHS):
+    model.train()
+    for idx, quotes in enumerate(train_dataloader):
+        quote_tens = quotes.to(device)
+        if quote_tens.size()[1] > MAX_SEQ_LEN:
+            continue
+        outputs = model(quote_tens, labels=quote_tens)
+        loss = outputs.loss
+        loss.backward()
+        optimizer.step()
+        scheduler.step()
+        optimizer.zero_grad()
+        model.zero_grad()
+    torch.save(model.state_dict(), f"trained_models/gpt2_quotes_{epoch}.pt")
+```
+
+### 7. Evaluate the Model
+Evaluate the model on the validation set:
+```python
+model.eval()
+validation_loss = 0.0
+for idx, quotes in enumerate(valid_dataloader):
+    quote_tens = quotes.to(device)
+    with torch.no_grad():
+        outputs = model(quote_tens, labels=quote_tens)
+        loss = outputs.loss
+        validation_loss += loss.item()
+print(f"Validation loss: {validation_loss / len(valid_dataloader)}")
+```
+
+### 8. Generate Quotes
+Use the fine-tuned model to generate new quotes:
+```python
+def choose_from_top(probs, n=5):
+    ind = np.argpartition(probs, -n)[-n:]
+    top_prob = probs[ind]
+    top_prob = top_prob / np.sum(top_prob)
+    chosen_index = np.random.choice(n, 1, p=top_prob)
+    token_id = ind[chosen_index][0]
+    return int(token_id)
+
+tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
+model = GPT2LMHeadModel.from_pretrained('gpt2')
+model.load_state_dict(torch.load(f"trained_models/gpt2_quotes_{MODEL_EPOCH}.pt"))
+model.to(device)
+
+with torch.no_grad():
+    for quote_idx in range(100):
+        cur_ids = torch.tensor(tokenizer.encode("QUOTE:")).unsqueeze(0).to(device)
+        for i in range(100):
+            outputs = model(cur_ids)
+            logits = outputs.logits
+            softmax_logits = torch.softmax(logits[0, -1], dim=0)
+            next_token_id = choose_from_top(softmax_logits.to('cpu').numpy(), n=3)
+            cur_ids = torch.cat([cur_ids, torch.ones((1, 1)).long().to(device) * next_token_id], dim=1)
+            if next_token_id == tokenizer.eos_token_id:
+                break
+        output_list = list(cur_ids.squeeze().to('cpu').numpy())
+        output_text = tokenizer.decode(output_list)
+        with open(f'generated_quotes_{MODEL_EPOCH}.txt', 'a') as f:
+            f.write(f"{output_text}\n\n")
+print(f"Generated quotes saved to generated_quotes_{MODEL_EPOCH}.txt")
+```
+
 # PART 4 : BERT-Based Sentiment Analysis on Amazon Fashion Reviews
 
 ## Project Overview
