@@ -310,7 +310,7 @@ To denormalize the predicted scores:
 ```python
 denormalized_score = scaler.inverse_transform(predicted_score)[0][0]
 ```
-# PART 3 : Fine-Tuning GPT-2 for Quote Generation
+# PART 3: Fine-Tuning GPT-2 for Quote Generation
 
 ## Project Overview
 This project demonstrates how to fine-tune the pre-trained GPT-2 language model on a custom dataset of quotes and use it to generate new quotes. The fine-tuning process involves training the model on a dataset of quotes to adapt its language generation capabilities to the style and content of the quotes.
@@ -464,7 +464,7 @@ with torch.no_grad():
 print(f"Generated quotes saved to generated_quotes_{MODEL_EPOCH}.txt")
 ```
 
-# PART 4 : BERT-Based Sentiment Analysis on Amazon Fashion Reviews
+# PART 4: BERT-Based Sentiment Analysis on Amazon Fashion Reviews
 
 ## Project Overview
 This project leverages a pre-trained BERT model (bert-base-uncased) to perform sentiment analysis on Amazon Fashion reviews. The goal is to fine-tune the BERT model to classify reviews as positive or negative, based on their star ratings. Reviews with 4 or 5 stars are labeled as positive, while reviews with 1, 2, or 3 stars are labeled as negative. The performance of the model is evaluated using standard metrics such as Accuracy, Loss, and F1 Score.
@@ -501,7 +501,7 @@ The dataset used in this project is the Amazon Fashion Reviews dataset, which ca
 
 ## Model Evaluation Metrics
 - **Accuracy**: The proportion of correct predictions out of the total number of predictions.
-- **Loss**: The value of the loss function, indicating how well the model is performing.
+- **Loss**: The value of the loss function, indicates how well the model is performing.
 - **F1 Score**: The harmonic mean of precision and recall, providing a single metric that balances both.
 
 
@@ -538,7 +538,7 @@ This project focused on predicting relevance scores for Arabic text using variou
 
 1. **Deep Learning Models for Text Analysis:**
    - Learned how to set up and train different RNN-based models (RNN, Bidirectional RNN, GRU, LSTM) for text relevance scoring.
-   - Understood the importance of choosing the right model architecture for specific text processing tasks.
+   - Understood the importance of choosing the right model architecture for specific text-processing tasks.
 
 2. **Normalization Techniques:**
    - Used `StandardScaler` for normalizing target variables, improving model performance.
